@@ -1,8 +1,8 @@
 require "spec_helper"
 require "filterrific/param_set"
+require "ostruct"
 
 module Filterrific
-  # Container for test data
   class TestData
     def self.filterrific_available_filters
       %w[
@@ -69,7 +69,6 @@ module Filterrific
     end
   end
 
-  # Simulates a class that would include the filterrific directive
   class ModelClass
     def self.filterrific_default_filter_params
       TestData.filterrific_default_filter_params
@@ -89,23 +88,23 @@ module Filterrific
 
     describe "initialization" do
       it "assigns resource class" do
-        filterrific_param_set.model_class.must_equal(ModelClass)
+        _(filterrific_param_set.model_class).must_equal(ModelClass)
       end
 
       describe "dynamic filter_name attr_accessors" do
         TestData.filterrific_available_filters.each do |filter_name|
           it "defines a getter for '#{filter_name}'" do
-            filterrific_param_set.must_respond_to(filter_name)
+            _(filterrific_param_set).must_respond_to(filter_name)
           end
 
           it "defines a setter for '#{filter_name}'" do
-            filterrific_param_set.must_respond_to("#{filter_name}=")
+            _(filterrific_param_set).must_respond_to("#{filter_name}=")
           end
         end
 
         TestData.filterrific_params.keys.each do |key|
           it "assigns conditioned param to '#{key}' attr" do
-            filterrific_param_set.send(key).must_equal(TestData.filterrific_params_after_conditioning[key])
+            _(filterrific_param_set.send(key)).must_equal(TestData.filterrific_params_after_conditioning[key])
           end
         end
       end
@@ -113,13 +112,13 @@ module Filterrific
 
     describe "find" do
       it "responds to #find" do
-        filterrific_param_set.must_respond_to(:find)
+        _(filterrific_param_set).must_respond_to(:find)
       end
     end
 
     describe "to_hash" do
       it "returns all filterrific_params as hash" do
-        filterrific_param_set.to_hash.must_equal(
+        _(filterrific_param_set.to_hash).must_equal(
           TestData.filterrific_params_as_hash
         )
       end
@@ -127,7 +126,7 @@ module Filterrific
 
     describe "to_json" do
       it "returns all filterrific_params as json string" do
-        filterrific_param_set.to_json.must_equal(
+        _(filterrific_param_set.to_json).must_equal(
           TestData.filterrific_params_as_hash.to_json
         )
       end
@@ -135,25 +134,23 @@ module Filterrific
 
     describe "#select_options" do
       it "exists" do
-        filterrific_param_set.select_options.must_equal({})
+        _(filterrific_param_set.select_options).must_equal({})
       end
 
       it "lets you assign a hash" do
-        # Make sure it doesn't raise an exception
         filterrific_param_set.select_options = {}
-        1.must_equal(1)
+        _(1).must_equal(1)
       end
 
       it "lets you set a value" do
-        # Make sure it doesn't raise an exception
         filterrific_param_set.select_options[:value] = 1
-        1.must_equal(1)
+        _(1).must_equal(1)
       end
 
       it "returns the same value you set" do
         value = rand(1..200)
         filterrific_param_set.select_options[:value] = value
-        filterrific_param_set.select_options[:value].must_equal(value)
+        _(filterrific_param_set.select_options[:value]).must_equal(value)
       end
     end
 
@@ -169,10 +166,10 @@ module Filterrific
         [{a_string: "abc"}, {a_string: "abc"}]
       ].each do |test_params, xpect|
         it "Handles #{test_params.inspect}" do
-          filterrific_param_set.send(
+          _(filterrific_param_set.send(
             :condition_filterrific_params,
             test_params
-          ).must_equal(xpect)
+          )).must_equal(xpect)
         end
       end
     end
